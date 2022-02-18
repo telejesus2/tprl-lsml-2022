@@ -50,12 +50,12 @@ the --legend flag and then provide a title for each logdir.
 
 """
 
-def plot_data(data, value="AverageReturn"):
+def plot_data(data, value="AverageReturn", x="Iteration"):
     if isinstance(data, list):
         data = pd.concat(data, ignore_index=True)
 
     sns.set(style="darkgrid", font_scale=1.5)
-    sns.lineplot(data=data, y=value, x="Iteration", hue="Condition") #, units="Unit", estimator=None)
+    sns.lineplot(data=data, y=value, x=x, hue="Condition") #, units="Unit", estimator=None)
     plt.legend(loc='best').set_draggable(True)
     plt.show()
 
@@ -88,7 +88,7 @@ def get_datasets(fpath, condition=None):
     return datasets
 
 
-def plot(logdir, legend=None, value=None):
+def plot(logdir, legend=None, value=None, x=None):
     use_legend = False
     if legend is not None:
         assert len(legend) == len(logdir), \
@@ -107,5 +107,9 @@ def plot(logdir, legend=None, value=None):
         values = value
     else:
         values = [value]
-    for value in values:
-        plot_data(data, value=value)
+    if isinstance(x, list):
+        xs = x
+    else:
+        xs = [x]*len(values)
+    for value, x in zip(values, xs):
+        plot_data(data, value=value, x=x)
