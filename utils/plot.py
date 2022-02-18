@@ -88,7 +88,7 @@ def get_datasets(fpath, condition=None):
     return datasets
 
 
-def plot(logdir, legend=None, value=None, x=None):
+def plot(logdir, legend=None, value=None, x="Iteration"):
     use_legend = False
     if legend is not None:
         assert len(legend) == len(logdir), \
