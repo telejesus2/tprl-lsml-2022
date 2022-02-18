@@ -2,7 +2,7 @@
 "batch_size"	:	32,
 "discount_factor"	:	0.95,
 "double_q"	:	false,
-"exp_name"	:	"myexp",
+"exp_name"	:	"car-dqn-constantreward",
 "learning_freq"	:	1,
 "learning_starts"	:	1000,
 "max_path_frames"	:	10000,
