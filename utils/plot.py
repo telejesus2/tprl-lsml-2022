@@ -128,7 +128,4 @@ def plot(logdir, legend=None, value=None, x="Iteration"):
         xs = [x]*len(values)
     for value, x in zip(values, xs):
         plot_data(data, value=value, x=x)
-    else:
-        xs = [x]*len(values)
-    for value, x in zip(values, xs):
-        plot_data(data, value=value, x=x)
+
