@@ -60,7 +60,7 @@ def plot_data(data, value="AverageReturn", x="Iteration"):
     plt.show()
 
 
-def get_datasets(fpath, condition=None):
+def get_datasets(fpath, condition=None, x='Iteration'):
     unit = 0
     datasets = []
     if 'log.txt' in os.listdir(fpath):
@@ -69,20 +69,34 @@ def get_datasets(fpath, condition=None):
         exp_name = params['exp_name']
         
         log_path = os.path.join(fpath,'log.txt')
-        experiment_data = pd.read_table(log_path)
+        experiment_data_all = pd.read_table(log_path)
 
-        experiment_data.insert(
-            len(experiment_data.columns),
-            'Unit',
-            unit
-            )        
-        experiment_data.insert(
-            len(experiment_data.columns),
-            'Condition',
-            condition or exp_name
-            )
+        # quick hack TODO
+        n = len(experiment_data_all) // len(experiment_data_all.loc[experiment_data_all['Iteration'] == experiment_data_all['Iteration'].min()])
 
-        datasets.append(experiment_data)
+        for i in range(0, len(experiment_data_all), n):
+          experiment_data = experiment_data_all[i:i + n]
+
+          if x == 'Episodes':
+            df = pd.DataFrame()
+            for ep in np.arange(0, experiment_data['Episodes'].max(), 50):
+              index = abs(experiment_data['Episodes'] - ep).idxmin()
+              experiment_data_all.loc[index,'Episodes'] = ep
+              df=df.append(experiment_data_all.iloc[[index]])
+            experiment_data = df
+
+          experiment_data.insert(
+              len(experiment_data.columns),
+              'Unit',
+              unit
+              )        
+          experiment_data.insert(
+              len(experiment_data.columns),
+              'Condition',
+              condition or exp_name
+              )
+
+          datasets.append(experiment_data)
         unit += 1
 
     return datasets
@@ -98,10 +112,10 @@ def plot(logdir, legend=None, value=None, x="Iteration"):
     data = []
     if use_legend:
         for logdir, legend_title in zip(logdir, legend):
-            data += get_datasets("experiments/" + logdir, legend_title)
+            data += get_datasets("experiments/" + logdir, legend_title, x=x)
     else:
         for logdir in logdir:
-            data += get_datasets("experiments/" + logdir)
+            data += get_datasets("experiments/" + logdir, x=x)
 
     if isinstance(value, list):
         values = value
@@ -109,6 +123,10 @@ def plot(logdir, legend=None, value=None, x="Iteration"):
         values = [value]
     if isinstance(x, list):
         xs = x
+    else:
+        xs = [x]*len(values)
+    for value, x in zip(values, xs):
+        plot_data(data, value=value, x=x)
     else:
         xs = [x]*len(values)
     for value, x in zip(values, xs):
